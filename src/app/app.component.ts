@@ -1,5 +1,4 @@
 import { Component } from '@angular/core'
-import { MeApiService } from './shared/services/me-api.service'
 
 @Component({
   selector: 'app-root',
@@ -7,9 +6,7 @@ import { MeApiService } from './shared/services/me-api.service'
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  constructor(private _meApiService: MeApiService) {}
+  constructor() {}
 
-  async ngOnInit(): Promise<void> {
-    this._meApiService.getMe()
-  }
+  ngOnInit(): void {}
 }
