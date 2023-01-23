@@ -1,0 +1,12 @@
+{
+  "name": "lanista-helper",
+  "version": "1.0",
+  "description": "lanista-helper Extension",
+  "manifest_version": 3,
+  "minimum_chrome_version": "92",
+  "action": {
+    "default_popup": "index.html"
+  },
+  "permissions": ["scripting", "tabs", "cookies", "http://*/*", "https://*/*"],
+  "host_permissions": ["<all_urls>", "http://*/*", "https://*/*"]
+}

@@ -1,0 +1,10 @@
+.send-button-wrapper {
+  // Padding / margin to match the form fields
+  padding-bottom: 16.125px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+mat-form-field {
+  min-width: 0px;
+}
