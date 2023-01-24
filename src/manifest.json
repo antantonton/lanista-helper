@@ -1,7 +1,7 @@
 {
-  "name": "lanista-helper",
-  "version": "1.0",
-  "description": "lanista-helper Extension",
+  "name": "Lanista Helper",
+  "version": "1.0.0",
+  "description": "Helper extension for mass creating challenges in the game Lanista",
   "manifest_version": 3,
   "minimum_chrome_version": "92",
   "action": {
@@ -12,6 +12,6 @@
     "48": "assets/icons/icon-48.png",
     "128": "assets/icons/icon-128.png"
   },
-  "permissions": ["scripting", "tabs", "cookies", "http://*/*", "https://*/*"],
-  "host_permissions": ["<all_urls>", "http://*/*", "https://*/*"]
+  "permissions": ["scripting", "cookies"],
+  "host_permissions": ["https://beta.lanista.se/"]
 }
