@@ -4,16 +4,7 @@ Chrome extension for mass creating challenges in the game [Lanista](https://beta
 
 ## Installation
 
-<ol>
-  <li>Download the latest version from "Releases"</li>
-  <li>Unzip the package somewhere on your computer</li>
-  <li>Open Chrome and go to the extensions</li>
-    <ol>
-      <li>Make sure you have enabled developer mode</li>
-    </ol>
-  <li>Click "Load unpacked" and select the folder you unzipped</li>
-  <li>Done!</li>
-</ol>
+Download from [Chrome Webstore](https://chrome.google.com/webstore/detail/lanista-helper/efeaiegdkamehenmpeakhbengbfndiek).
 
 ## Development
 
