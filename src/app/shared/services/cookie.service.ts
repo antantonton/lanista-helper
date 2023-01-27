@@ -11,7 +11,7 @@ export class CookieService {
    * Returns the current auth token from cookies
    * @returns
    */
-  async getAuthToken(): Promise<string> {
+  async getAuthToken(): Promise<string | void> {
     const token = await this._scriptService.runFunction<string>(() => {
       const parseCookie = (str: string) =>
         str

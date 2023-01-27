@@ -36,7 +36,7 @@ export class ChallengeComponent implements OnInit, OnDestroy {
     .map((v) => (v + 1) / 10)
     .reverse()
 
-  me: Me | undefined
+  me: Me
   tactics: { [id: number]: string } = {}
   sending = false
 

@@ -32,13 +32,13 @@ export class MeApiService {
   ) {}
 
   async getMe(): Promise<Me> {
-    const token = await this._cookieService.getAuthToken()
-    const me = await this._scriptService.runFunction<Promise<Me>>(
+    const token = (await this._cookieService.getAuthToken()) as string
+    const me: Me = (await this._scriptService.runFunction<Promise<Me>>(
       (url: string, parameters: any) => {
         return fetch(url, parameters).then((response) => response.json())
       },
       [this._meUrl, this._getMeParameters(token)],
-    )
+    )) as Me
     return me
   }
 

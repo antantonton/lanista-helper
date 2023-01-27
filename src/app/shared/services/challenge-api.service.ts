@@ -36,6 +36,9 @@ export class ChallengeApiService {
 
   async sendChallenge(challenge: Challenge): Promise<void> {
     const token = await this._cookieService.getAuthToken()
+    if (!token) {
+      return
+    }
 
     const response: any[] = (
       await this._scriptService.runFunction(

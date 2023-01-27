@@ -1,14 +1,20 @@
 import { Injectable } from '@angular/core'
+import { TabService } from './tab.service'
 
 @Injectable({
   providedIn: 'root',
 })
 export class ScriptService {
+  constructor(private _tabService: TabService) {}
+
   async runFunction<T>(
     functionToRun: (...args: any) => T,
     args?: any,
-  ): Promise<T> {
-    const tab = await this._getCurrentTab()
+  ): Promise<T | void> {
+    const tab = await this._tabService.getLanistaTab()
+    if (!tab) {
+      return
+    }
 
     return new Promise<T>((resolve) => {
       chrome.scripting.executeScript(
@@ -22,11 +28,5 @@ export class ScriptService {
         },
       )
     })
-  }
-
-  private async _getCurrentTab(): Promise<chrome.tabs.Tab> {
-    let queryOptions = { active: true, currentWindow: true }
-    let [tab] = await chrome.tabs.query(queryOptions)
-    return tab
   }
 }
