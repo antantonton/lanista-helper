@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 
 export enum LocalStorageItem {
   RACE_CHALLENGE_DEFAULTS = 'RACE_CHALLENGE_DEFAULTS',
+  CHALLENGE_FORM_DEFAULTS = 'CHALLENGE_FORM_DEFAULTS',
 }
 
 @Injectable({

@@ -13,6 +13,14 @@ import {
   LocalStorageService,
 } from '../shared/services/local-storage.service'
 import { Subscription } from 'rxjs'
+
+type ChallengeFormValue = {
+  min_level: number | null
+  max_level: number | null
+  min_start_percentage: number | null
+}
+type StoredChallengeFormValue = { [id: number]: ChallengeFormValue }
+
 @Component({
   selector: 'app-challenge',
   templateUrl: './challenge.component.html',
@@ -20,12 +28,15 @@ import { Subscription } from 'rxjs'
 })
 export class ChallengeComponent implements OnInit, OnDestroy {
   private readonly _subscriptions = new Subscription()
+  readonly storedChallengeFormValues = this._localStorageService.read<
+    StoredChallengeFormValue | undefined
+  >(LocalStorageItem.CHALLENGE_FORM_DEFAULTS)
   readonly storedRaceTactics =
     this._localStorageService.read<StoredRaceTactics>(
       LocalStorageItem.RACE_CHALLENGE_DEFAULTS,
     )
   readonly challengeForm = new FormGroup({
-    min_level: new FormControl(1),
+    min_level: new FormControl(null),
     max_level: new FormControl(null),
     min_start_percentage: new FormControl(null),
   })
@@ -57,8 +68,15 @@ export class ChallengeComponent implements OnInit, OnDestroy {
       // Initialize the general challenge form
       this.me = me
       this.challengeForm.patchValue({
-        min_start_percentage: this.me.avatar.default_autostart_percentage,
-        max_level: this.me.avatar.level.level,
+        min_level:
+          this.storedChallengeFormValues?.[this.me.avatar.id]?.min_level ?? 1,
+        min_start_percentage:
+          this.storedChallengeFormValues?.[this.me.avatar.id]
+            ?.min_start_percentage ??
+          this.me.avatar.default_autostart_percentage,
+        max_level:
+          this.storedChallengeFormValues?.[this.me.avatar.id]?.max_level ??
+          this.me.avatar.level.level,
       })
 
       // Get all races, assemble a form for each using the stored race tactics
@@ -88,6 +106,14 @@ export class ChallengeComponent implements OnInit, OnDestroy {
         this._localStorageService.write<StoredRaceTactics>(
           LocalStorageItem.RACE_CHALLENGE_DEFAULTS,
           { ...this.storedRaceTactics, [this.me.avatar.id]: value },
+        )
+      }),
+    )
+    this._subscriptions.add(
+      this.challengeForm.valueChanges.subscribe((value: ChallengeFormValue) => {
+        this._localStorageService.write(
+          LocalStorageItem.CHALLENGE_FORM_DEFAULTS,
+          { ...this.storedChallengeFormValues, [this.me.avatar.id]: value },
         )
       }),
     )
