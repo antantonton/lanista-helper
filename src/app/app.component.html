@@ -1,3 +1,15 @@
 <div class="app-container" fxLayout="column">
-  <app-challenge></app-challenge>
+  <app-challenge *ngIf="lanistaTab"></app-challenge>
+
+  <div
+    *ngIf="!lanistaTab"
+    fxLayout="column"
+    fxLayoutAlign="start center"
+    fxLayoutGap="24px"
+  >
+    <h3>Lanista must be open to use this extension</h3>
+    <button mat-flat-button color="accent" (click)="onOpenClick()">
+      Open Lanista
+    </button>
+  </div>
 </div>
