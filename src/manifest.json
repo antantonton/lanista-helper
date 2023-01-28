@@ -13,5 +13,17 @@
     "128": "assets/icons/icon-128.png"
   },
   "permissions": ["scripting"],
-  "host_permissions": ["https://beta.lanista.se/"]
+  "host_permissions": ["https://beta.lanista.se/"],
+  "web_accessible_resources": [
+    {
+      "resources": ["index.html"],
+      "matches": ["https://beta.lanista.se/*"]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://beta.lanista.se/*"],
+      "js": ["assets/scripts/inject.js"]
+    }
+  ]
 }

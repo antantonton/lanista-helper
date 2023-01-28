@@ -1,4 +1,17 @@
-<div class="app-container" fxLayout="column">
+<div
+  class="app-container"
+  [class.expanded]="expanded"
+  fxLayout="row"
+  fxLayoutAlign="start center"
+>
+  <span> Lanista Helper </span>
+
+  <div fxFlex></div>
+
+  <button mat-flat-button color="accent" (click)="onTestClick()">Test</button>
+</div>
+
+<div *ngIf="false" class="app-container" fxLayout="column">
   <app-challenge *ngIf="lanistaTab"></app-challenge>
 
   <div
