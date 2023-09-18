@@ -35,10 +35,8 @@ export class AppComponent {
     chrome.tabs.create({ url: LANISTA_BASE_URL })
   }
 
-  onExpandClick(): void {
-    this.expanded = true
-
-    this._scriptService.runFunction(
+  async onExpandClick(): Promise<void> {
+    await this._scriptService.runFunction(
       (iframeId: string) => {
         console.log('frameId: ', iframeId)
         const existingElement = document.getElementById(
@@ -46,29 +44,18 @@ export class AppComponent {
         ) as HTMLIFrameElement
         if (existingElement) {
           console.log('existingelement: ', existingElement)
-          // existingElement.remove()
           existingElement.style.height = '100%'
           existingElement.style.width = '100%'
-          // existingElement.style.bottom = '50%'
-          // existingElement.style.right = '50%'
-          // existingElement.style.transform = 'translate(50%, 50%)'
-          // existingElement.style.height =
-          //   existingElement.contentWindow.document.documentElement
-          //     .scrollHeight + 'px'
-
-          // existingElement.style.height = '256px'
-          // existingElement.style.height = h
-          // }
         }
       },
       [this.iframeId],
     )
+    this.expanded = true
   }
 
-  onBackgroundClick(): void {
+  async onBackgroundClick(): Promise<void> {
     if (this.expanded) {
-      this.expanded = false
-      this._scriptService.runFunction(
+      await this._scriptService.runFunction(
         (iframeId: string) => {
           console.log('frameId: ', iframeId)
           const existingElement = document.getElementById(
@@ -76,53 +63,13 @@ export class AppComponent {
           ) as HTMLIFrameElement
           if (existingElement) {
             console.log('existingelement: ', existingElement)
-            // existingElement.remove()
             existingElement.style.height = '64px'
             existingElement.style.width = '64px'
-            // existingElement.style.bottom = '50%'
-            // existingElement.style.right = '50%'
-            // existingElement.style.transform = 'translate(50%, 50%)'
-            // existingElement.style.height =
-            //   existingElement.contentWindow.document.documentElement
-            //     .scrollHeight + 'px'
-
-            // existingElement.style.height = '256px'
-            // existingElement.style.height = h
-            // }
           }
         },
         [this.iframeId],
       )
+      this.expanded = false
     }
-  }
-
-  onTestClick = (): void => {
-    this.expanded = !this.expanded
-    console.log('this.expandedHeight: ', this.expandedHeight)
-    let height = this.expanded ? this.expandedHeight : this.normalHeight
-    console.log('height: ', height)
-    console.log('hej frameId: ', this.iframeId)
-
-    this._scriptService.runFunction(
-      (iframeId: string, height: string) => {
-        console.log('height: ', height)
-        console.log('frameId: ', iframeId)
-        const existingElement = document.getElementById(
-          iframeId,
-        ) as HTMLIFrameElement
-        if (existingElement) {
-          console.log('existingelement: ', existingElement)
-          existingElement.remove()
-          // existingElement.style.height =
-          //   existingElement.contentWindow.document.documentElement
-          //     .scrollHeight + 'px'
-
-          // existingElement.style.height = '256px'
-          // existingElement.style.height = h
-          // }
-        }
-      },
-      [this.iframeId, '' + height],
-    )
   }
 }
