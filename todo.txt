@@ -1,0 +1,11 @@
+Framework
+- Change to prime NG instead of materials
+- Fix so that challenge component is opened from action button
+    - Use different routes for action button and overlay
+
+UI
+- Add exit animation
+
+Features
+- Add basic card function
+- Add city cooldowns as overlay

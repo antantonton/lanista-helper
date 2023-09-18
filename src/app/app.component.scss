@@ -1,9 +1,33 @@
-.app-container {
-  width: 100%;
-  height: 64px;
-  background-color: white;
+:host {
+  display: block;
+  height: 100vh;
 }
 
-.expanded {
-  height: 256px;
+.not-expanded-container {
+  background: rgba(0, 0, 0, 0);
+}
+
+.expanded-container {
+  display: block;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  -webkit-animation: fade-in 0.5s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+  animation: fade-in 0.5s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+}
+
+@-webkit-keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

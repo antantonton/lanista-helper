@@ -1,17 +1,34 @@
 <div
-  class="app-container"
-  [class.expanded]="expanded"
+  class="expanded-container"
+  *ngIf="expanded"
   fxLayout="row"
   fxLayoutAlign="start center"
+  (click)="onBackgroundClick()"
 >
-  <span> Lanista Helper </span>
-
-  <div fxFlex></div>
-
-  <button mat-flat-button color="accent" (click)="onTestClick()">Test</button>
+  <div *ngIf="expanded" fxLayout="column">
+    <div style="height: 400px; width: 400px; background-color: white">
+      <span>hello world</span>
+    </div>
+  </div>
 </div>
 
-<div *ngIf="false" class="app-container" fxLayout="column">
+<div
+  *ngIf="!expanded"
+  class="not-expanded-container"
+  fxLayout="column"
+  fxLayoutAlign="start center"
+>
+  <button
+    mat-mini-fab
+    color="accent"
+    *ngIf="!expanded"
+    (click)="onExpandClick(); $event.stopPropagation()"
+  >
+    <mat-icon>home</mat-icon>
+  </button>
+</div>
+
+<!-- <div *ngIf="false" class="app-container" fxLayout="column">
   <app-challenge *ngIf="lanistaTab"></app-challenge>
 
   <div
@@ -25,4 +42,4 @@
       Open Lanista
     </button>
   </div>
-</div>
+</div> -->

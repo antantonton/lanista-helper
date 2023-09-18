@@ -3,8 +3,12 @@
 // @import "~@angular/material/prebuilt-themes/pink-bluegrey.css";
 // @import "~@angular/material/prebuilt-themes/purple-green.css";
 
+html {
+  height: -webkit-fill-available;
+}
+
 body {
+  min-height: -webkit-fill-available;
+  margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
-  margin: 0px;
-  height: 100%;
 }
