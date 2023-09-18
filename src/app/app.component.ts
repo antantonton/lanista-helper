@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
 import { TabService } from './shared/services/tab.service'
 import { LANISTA_BASE_URL } from './shared/constants/lanista.constants'
+import { ROUTES } from './app-routing.module'
 
 @Component({
   selector: 'app-root',

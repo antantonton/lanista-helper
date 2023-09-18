@@ -1,6 +1,8 @@
-<div class="app-container" fxLayout="column">
-  <app-challenge *ngIf="lanistaTab"></app-challenge>
+<div class="app-container" fxLayout="column" fxLayoutGap="12px">
+  <!-- Router Outlet -->
+  <router-outlet *ngIf="lanistaTab"></router-outlet>
 
+  <!-- Empty State -->
   <div
     *ngIf="!lanistaTab"
     fxLayout="column"

@@ -37,9 +37,18 @@ import { MatExpansionModule } from '@angular/material/expansion'
 import { AppComponent } from './app.component'
 import { ChallengeComponent } from './challenge/challenge.component'
 import { PercentageLabelPipe } from './shared/pipes/percentage-label.pipe'
+import { AppRoutingModule } from './app-routing.module'
+import { BackgroundComponent } from './background/background.component';
+import { PopupComponent } from './popup/popup.component'
 
 @NgModule({
-  declarations: [AppComponent, ChallengeComponent, PercentageLabelPipe],
+  declarations: [
+    AppComponent,
+    ChallengeComponent,
+    PercentageLabelPipe,
+    BackgroundComponent,
+    PopupComponent,
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -75,6 +84,7 @@ import { PercentageLabelPipe } from './shared/pipes/percentage-label.pipe'
     MatSlideToggleModule,
     MatButtonToggleModule,
     MatExpansionModule,
+    AppRoutingModule,
   ],
 
   providers: [],
