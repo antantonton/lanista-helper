@@ -1,4 +1,5 @@
 Framework
+- Create shadow DOM instead of iframe for more flexibility
 - Change to prime NG instead of materials
 - Fix so that challenge component is opened from action button
     - Use different routes for action button and overlay
