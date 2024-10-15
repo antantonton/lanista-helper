@@ -4,31 +4,6 @@
   gap: 16px;
 }
 
-.panel-description {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  gap: 48px;
-  justify-content: end;
-}
-
-.race-form-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 12px;
-
-  .tactic-field {
-    flex: 0 1 200px;
-  }
-  
-  .give-up-field {
-    flex: 1 1 33%;
-  }
-}
-
-
-
 .bottom-row {
   display: flex;
   flex-direction: row;
@@ -45,7 +20,6 @@
     button {
       flex: 1 1 auto;
     }
-    
   }
 }
 
@@ -54,4 +28,61 @@
   display: flex;
   flex-direction: row;
   justify-content: center;
+}
+
+.race-forms-container {
+  display: flex;
+  flex-direction: column;
+
+  .race-column {
+    display: flex;
+    flex-direction: column;
+
+    .race-form-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: start;
+      align-items: center;
+      gap: 12px;
+
+      .race-form-toggle {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        flex: 0 0 25%;
+        label {
+          font-size: 16px;
+          font-weight: 500;
+          margin-right: 16px;
+        }
+      }
+    }
+  }
+}
+
+:host ::ng-deep .race-divider {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+:host ::ng-deep .race-dropdown {
+  display: flex;
+  flex: 1 1 auto;
+}
+
+.bottom-row-container {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+
+  .bottom-row-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+:host ::ng-deep .level-input {
+  width: 75px;
 }

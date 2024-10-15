@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, inject, OnDestroy, OnInit } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import {
   ChallengeApiService,
@@ -12,7 +12,9 @@ import {
   LocalStorageItem,
   LocalStorageService,
 } from '../shared/services/local-storage.service'
-import { Subscription } from 'rxjs'
+import { firstValueFrom, Subscription } from 'rxjs'
+import { TitleCasePipe } from '@angular/common'
+import { PercentageLabelPipe } from '../shared/pipes/percentage-label.pipe'
 
 type ChallengeFormValue = {
   min_level: number | null
@@ -27,6 +29,8 @@ type StoredChallengeFormValue = { [id: number]: ChallengeFormValue }
   styleUrls: ['./challenge.component.scss'],
 })
 export class ChallengeComponent implements OnInit, OnDestroy {
+  private readonly _percentageLabelPipe = inject(PercentageLabelPipe)
+  private readonly _titleCasePipe = inject(TitleCasePipe)
   private readonly _subscriptions = new Subscription()
   readonly storedChallengeFormValues = this._localStorageService.read<
     StoredChallengeFormValue | undefined
@@ -43,12 +47,11 @@ export class ChallengeComponent implements OnInit, OnDestroy {
   readonly raceForms = new FormGroup({})
   readonly tactics$ = this._configApiService.getTacticsObservable()
   readonly races$ = this._configApiService.getRacesObservable()
-  readonly percentageOptions: number[] = [...Array(10).keys()]
-    .map((v) => (v + 1) / 10)
-    .reverse()
+  percentageOptions: { label: string; value: number }[] = []
 
   me: Me
   tactics: { [id: number]: string } = {}
+  tacticOptions: { label: string; value: number }[] = []
   sending = false
 
   constructor(
@@ -59,14 +62,30 @@ export class ChallengeComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.tactics$.toPromise().then((tactics) => {
+    firstValueFrom(this.tactics$).then((tactics) => {
       // Invert the tactics object so that we may use it to map id to label
       this.tactics = invert(tactics)
+      this.tacticOptions = Object.entries(tactics).map(([label, value]) => ({
+        label: this._titleCasePipe.transform(label),
+        value: value,
+      }))
     })
 
     this._meApiService.getMe().then((me) => {
       // Initialize the general challenge form
       this.me = me
+      this.percentageOptions = [...Array(10).keys()]
+        .map((v) => {
+          const value = (v + 1) / 10
+          return {
+            label: this._percentageLabelPipe.transform(
+              value,
+              me?.avatar?.max_hp ?? 0,
+            ),
+            value: value,
+          }
+        })
+        .reverse()
       this.challengeForm.patchValue({
         min_level:
           this.storedChallengeFormValues?.[this.me.avatar.id]?.min_level ?? 1,
@@ -80,13 +99,14 @@ export class ChallengeComponent implements OnInit, OnDestroy {
       })
 
       // Get all races, assemble a form for each using the stored race tactics
-      this.races$.toPromise().then((races) => {
+      firstValueFrom(this.races$).then((races) => {
         for (const race of races) {
           this.raceForms.registerControl(
             race.id.toString(),
             new FormGroup({
               enabled: new FormControl(
-                this.storedRaceTactics?.[this.me.avatar.id]?.[race.id]?.enabled ?? true
+                this.storedRaceTactics?.[this.me.avatar.id]?.[race.id]
+                  ?.enabled ?? true,
               ),
               battle_tactic: new FormControl(
                 this.storedRaceTactics?.[this.me.avatar.id]?.[race.id]
@@ -143,7 +163,11 @@ export class ChallengeComponent implements OnInit, OnDestroy {
     this.sending = true
 
     const value: {
-      [race: string]: { battle_tactic: number; give_up_percentage: number, enabled: boolean }
+      [race: string]: {
+        battle_tactic: number
+        give_up_percentage: number
+        enabled: boolean
+      }
     } = this.raceForms.value
     for (const race of Object.keys(this.raceForms.value)) {
       if (value[race].enabled) {

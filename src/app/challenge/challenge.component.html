@@ -1,6 +1,6 @@
 <div *ngIf="me" class="challenge-container">
   <!-- Race Accordion -->
-  <mat-accordion>
+  <mat-accordion *ngIf="false">
     <mat-expansion-panel
       *ngFor="let race of races$ | async; let index = index"
       [formGroup]="getRaceForm(race.id)"
@@ -37,7 +37,11 @@
         <mat-checkbox formControlName="enabled"></mat-checkbox>
 
         <!-- Tactic -->
-        <mat-form-field appearance="outline" class="tactic-field" subscriptSizing="dynamic">
+        <mat-form-field
+          appearance="outline"
+          class="tactic-field"
+          subscriptSizing="dynamic"
+        >
           <mat-label>Tactic</mat-label>
           <mat-select formControlName="battle_tactic">
             <mat-option
@@ -50,14 +54,20 @@
         </mat-form-field>
 
         <!-- Give up at -->
-        <mat-form-field appearance="outline" class="give-up-field" subscriptSizing="dynamic">
+        <mat-form-field
+          appearance="outline"
+          class="give-up-field"
+          subscriptSizing="dynamic"
+        >
           <mat-label>Give up at</mat-label>
           <mat-select formControlName="give_up_percentage">
             <mat-option
               *ngFor="let percentage of percentageOptions"
               [value]="percentage"
             >
-              <span style="white-space: nowrap">{{ percentage | percentageLabel : me?.avatar?.max_hp }}</span>
+              <span style="white-space: nowrap">{{
+                percentage | percentageLabel : me?.avatar?.max_hp
+              }}</span>
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -65,7 +75,86 @@
     </mat-expansion-panel>
   </mat-accordion>
 
-  <div [formGroup]="challengeForm" class="bottom-row">
+  <!-- Race Forms -->
+  <div class="race-forms-container">
+    <div
+      *ngFor="let race of races$ | async; index as index"
+      class="race-column"
+    >
+      <div class="race-form-row" [formGroup]="getRaceForm(race.id)">
+        <div class="race-form-toggle">
+          <!-- Race Enabled -->
+          <p-checkbox
+            formControlName="enabled"
+            [binary]="true"
+            [inputId]="'raceCheckbox' + index"
+          />
+          <label [for]="'raceCheckbox' + index">
+            {{ race.name | titlecase }}
+          </label>
+        </div>
+
+        <!-- Race Tactic Selector -->
+        <p-dropdown
+          class="race-dropdown"
+          styleClass="race-dropdown"
+          formControlName="battle_tactic"
+          [options]="tacticOptions"
+          optionLabel="label"
+          optionValue="value"
+        />
+
+        <!-- Race Give up At Selector -->
+        <p-dropdown
+          styleClass="race-dropdown"
+          formControlName="give_up_percentage"
+          [options]="percentageOptions"
+          optionLabel="label"
+          optionValue="value"
+        />
+      </div>
+      <p-divider styleClass="race-divider" />
+    </div>
+  </div>
+
+  <!-- Bottom Row -->
+  <div class="bottom-row-container" [formGroup]="challengeForm">
+    <!-- Min Level Input -->
+    <div class="bottom-row-input-wrapper">
+      <label for="minLevel">Min</label>
+      <p-inputNumber
+        formControlName="min_level"
+        autocomplete="off"
+        [showButtons]="true"
+        inputId="minLevel"
+      />
+    </div>
+
+    <!-- Nax Level Input -->
+    <div class="bottom-row-input-wrapper level-input">
+      <label for="minLevel">Max</label>
+      <p-inputNumber
+        styleClass=""
+        formControlName="max_level"
+        autocomplete="off"
+        [showButtons]="true"
+        inputId="minLevel"
+      />
+    </div>
+
+    <!-- Start At Selector -->
+    <div class="bottom-row-input-wrapper">
+      <label for="minLevel">Start at</label>
+      <p-dropdown
+        formControlName="min_start_percentage"
+        [options]="percentageOptions"
+        optionLabel="label"
+        optionValue="value"
+      />
+    </div>
+  </div>
+
+  <div [formGroup]="challengeForm" class="bottom-row" *ngIf="false">
     <!-- Min level -->
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Min</mat-label>
@@ -96,13 +185,13 @@
           *ngFor="let percentage of percentageOptions"
           [value]="percentage"
         >
-          {{ percentage | percentageLabel : me?.avatar?.max_hp }}
+          {{ percentage.value | percentageLabel : me?.avatar?.max_hp }}
         </mat-option>
       </mat-select>
     </mat-form-field>
 
     <!-- Send button -->
-     <div class="button-wrapper">
+    <div class="button-wrapper">
       <button
         mat-flat-button
         color="accent"
@@ -114,7 +203,6 @@
           ><mat-spinner color="accent" diameter="24"></mat-spinner
         ></mat-icon>
       </button>
-
     </div>
   </div>
 </div>

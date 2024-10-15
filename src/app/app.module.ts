@@ -33,11 +33,18 @@ import { MatMenuModule } from '@angular/material/menu'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { MatButtonToggleModule } from '@angular/material/button-toggle'
 import { MatExpansionModule } from '@angular/material/expansion'
-import {MatCheckboxModule} from '@angular/material/checkbox'
+import { MatCheckboxModule } from '@angular/material/checkbox'
 import { AppComponent } from './app.component'
 import { ChallengeComponent } from './challenge/challenge.component'
-import { PercentageLabelPipe } from './shared/pipes/percentage-label.pipe';
+import { PercentageLabelPipe } from './shared/pipes/percentage-label.pipe'
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
+import { AccordionModule } from 'primeng/accordion'
+import { CheckboxModule } from 'primeng/checkbox'
+import { InputNumberModule } from 'primeng/inputnumber'
+import { ButtonModule } from 'primeng/button'
+import { DropdownModule } from 'primeng/dropdown'
+import { TitleCasePipe } from '@angular/common'
+import { DividerModule } from 'primeng/divider'
 
 @NgModule({
   declarations: [AppComponent, ChallengeComponent, PercentageLabelPipe],
@@ -75,12 +82,18 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
     MatSlideToggleModule,
     MatButtonToggleModule,
     MatExpansionModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+
+    // PrimeNG
+    AccordionModule,
+    CheckboxModule,
+    InputNumberModule,
+    ButtonModule,
+    DropdownModule,
+    DividerModule,
   ],
 
-  providers: [
-    provideAnimationsAsync()
-  ],
+  providers: [provideAnimationsAsync(), TitleCasePipe, PercentageLabelPipe],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
