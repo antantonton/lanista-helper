@@ -85,6 +85,9 @@ export class ChallengeComponent implements OnInit, OnDestroy {
           this.raceForms.registerControl(
             race.id.toString(),
             new FormGroup({
+              enabled: new FormControl(
+                this.storedRaceTactics?.[this.me.avatar.id]?.[race.id]?.enabled ?? true
+              ),
               battle_tactic: new FormControl(
                 this.storedRaceTactics?.[this.me.avatar.id]?.[race.id]
                   ?.battle_tactic ?? this.me.avatar.default_tactic,
@@ -140,19 +143,21 @@ export class ChallengeComponent implements OnInit, OnDestroy {
     this.sending = true
 
     const value: {
-      [race: string]: { battle_tactic: number; give_up_percentage: number }
+      [race: string]: { battle_tactic: number; give_up_percentage: number, enabled: boolean }
     } = this.raceForms.value
     for (const race of Object.keys(this.raceForms.value)) {
-      await this._challengeApiService.sendChallenge({
-        battle_tactic: value[race].battle_tactic,
-        give_up_percentage: value[race].give_up_percentage,
-        min_start_percentage: this.challengeForm.value.min_start_percentage,
-        min_level: this.challengeForm.value.min_level,
-        max_level: this.challengeForm.value.max_level,
-        query: '',
-        battle_mode: 0,
-        race: parseInt(race),
-      })
+      if (value[race].enabled) {
+        await this._challengeApiService.sendChallenge({
+          battle_tactic: value[race].battle_tactic,
+          give_up_percentage: value[race].give_up_percentage,
+          min_start_percentage: this.challengeForm.value.min_start_percentage,
+          min_level: this.challengeForm.value.min_level,
+          max_level: this.challengeForm.value.max_level,
+          query: '',
+          battle_mode: 0,
+          race: parseInt(race),
+        })
+      }
     }
     this.sending = false
   }

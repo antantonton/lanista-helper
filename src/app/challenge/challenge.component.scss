@@ -1,10 +1,57 @@
-.send-button-wrapper {
-  // Padding / margin to match the form fields
-  padding-bottom: 16.125px;
-  margin-top: 3px;
-  margin-bottom: 3px;
+.challenge-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-mat-form-field {
-  min-width: 0px;
+.panel-description {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 48px;
+  justify-content: end;
+}
+
+.race-form-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+
+  .tactic-field {
+    flex: 0 1 200px;
+  }
+  
+  .give-up-field {
+    flex: 1 1 33%;
+  }
+}
+
+
+
+.bottom-row {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+
+  mat-form-field {
+    flex: 1 1 auto;
+  }
+
+  .button-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    button {
+      flex: 1 1 auto;
+    }
+    
+  }
+}
+
+.spinner-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }

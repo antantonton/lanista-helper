@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
 // Angular
-import { FlexLayoutModule } from '@angular/flex-layout'
+// import { FlexLayoutModule } from '@angular/flex-layout'
 import { ReactiveFormsModule } from '@angular/forms'
 
 // Material
@@ -33,10 +33,11 @@ import { MatMenuModule } from '@angular/material/menu'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { MatButtonToggleModule } from '@angular/material/button-toggle'
 import { MatExpansionModule } from '@angular/material/expansion'
-
+import {MatCheckboxModule} from '@angular/material/checkbox'
 import { AppComponent } from './app.component'
 import { ChallengeComponent } from './challenge/challenge.component'
-import { PercentageLabelPipe } from './shared/pipes/percentage-label.pipe'
+import { PercentageLabelPipe } from './shared/pipes/percentage-label.pipe';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
 
 @NgModule({
   declarations: [AppComponent, ChallengeComponent, PercentageLabelPipe],
@@ -45,7 +46,6 @@ import { PercentageLabelPipe } from './shared/pipes/percentage-label.pipe'
     BrowserAnimationsModule,
 
     // Angular
-    FlexLayoutModule,
     ReactiveFormsModule,
 
     // Material
@@ -75,9 +75,12 @@ import { PercentageLabelPipe } from './shared/pipes/percentage-label.pipe'
     MatSlideToggleModule,
     MatButtonToggleModule,
     MatExpansionModule,
+    MatCheckboxModule
   ],
 
-  providers: [],
+  providers: [
+    provideAnimationsAsync()
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

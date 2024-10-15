@@ -1,4 +1,4 @@
-<div *ngIf="me" fxLayout="column" fxLayoutGap="16px">
+<div *ngIf="me" class="challenge-container">
   <!-- Race Accordion -->
   <mat-accordion>
     <mat-expansion-panel
@@ -13,8 +13,8 @@
           </span>
         </mat-panel-title>
 
-        <mat-panel-description>
-          <div fxFill fxLayout="row" fxLayoutAlign="end" fxLayoutGap="48px">
+        <mat-panel-description *ngIf="getRaceForm(race.id).value.enabled">
+          <div class="panel-description">
             <!-- Tactic -->
             <span>{{
               tactics[getRaceForm(race.id).value.battle_tactic] | titlecase
@@ -32,9 +32,12 @@
       </mat-expansion-panel-header>
 
       <!-- Race Forms -->
-      <div fxLayout="row" fxLayoutGap="12px">
+      <div class="race-form-container">
+        <!-- Enabled -->
+        <mat-checkbox formControlName="enabled"></mat-checkbox>
+
         <!-- Tactic -->
-        <mat-form-field appearance="outline" fxFlex="66">
+        <mat-form-field appearance="outline" class="tactic-field" subscriptSizing="dynamic">
           <mat-label>Tactic</mat-label>
           <mat-select formControlName="battle_tactic">
             <mat-option
@@ -47,14 +50,14 @@
         </mat-form-field>
 
         <!-- Give up at -->
-        <mat-form-field appearance="outline" fxFlex="33">
+        <mat-form-field appearance="outline" class="give-up-field" subscriptSizing="dynamic">
           <mat-label>Give up at</mat-label>
           <mat-select formControlName="give_up_percentage">
             <mat-option
               *ngFor="let percentage of percentageOptions"
               [value]="percentage"
             >
-              {{ percentage | percentageLabel : me?.avatar?.max_hp }}
+              <span style="white-space: nowrap">{{ percentage | percentageLabel : me?.avatar?.max_hp }}</span>
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -62,9 +65,9 @@
     </mat-expansion-panel>
   </mat-accordion>
 
-  <div fxLayout="row" fxLayoutGap="12px" [formGroup]="challengeForm">
+  <div [formGroup]="challengeForm" class="bottom-row">
     <!-- Min level -->
-    <mat-form-field appearance="outline" fxFlex>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Min</mat-label>
       <input
         matInput
@@ -75,7 +78,7 @@
     </mat-form-field>
 
     <!-- Max level -->
-    <mat-form-field appearance="outline" fxFlex>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Max</mat-label>
       <input
         matInput
@@ -86,7 +89,7 @@
     </mat-form-field>
 
     <!-- Start at -->
-    <mat-form-field appearance="outline" fxFlex>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Start at</mat-label>
       <mat-select formControlName="min_start_percentage">
         <mat-option
@@ -99,9 +102,8 @@
     </mat-form-field>
 
     <!-- Send button -->
-    <div fxFlex fxLayout="row" class="send-button-wrapper">
+     <div class="button-wrapper">
       <button
-        fxFlex
         mat-flat-button
         color="accent"
         [disabled]="sending"
@@ -112,11 +114,12 @@
           ><mat-spinner color="accent" diameter="24"></mat-spinner
         ></mat-icon>
       </button>
+
     </div>
   </div>
 </div>
 
 <!-- Loading spinner -->
-<div *ngIf="!me" fxLayout="row" fxLayoutAlign="center">
+<div *ngIf="!me" class="spinner-container">
   <mat-spinner diameter="48" color="accent"></mat-spinner>
 </div>

@@ -15,6 +15,7 @@ export type Challenge = {
 }
 
 export type RaceTactic = {
+  enabled: boolean
   battle_tactic: number
   give_up_percentage: number
 }
