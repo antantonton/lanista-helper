@@ -45,6 +45,7 @@ import { ButtonModule } from 'primeng/button'
 import { DropdownModule } from 'primeng/dropdown'
 import { TitleCasePipe } from '@angular/common'
 import { DividerModule } from 'primeng/divider'
+import { ProgressSpinnerModule } from 'primeng/progressspinner'
 
 @NgModule({
   declarations: [AppComponent, ChallengeComponent, PercentageLabelPipe],
@@ -91,6 +92,7 @@ import { DividerModule } from 'primeng/divider'
     ButtonModule,
     DropdownModule,
     DividerModule,
+    ProgressSpinnerModule,
   ],
 
   providers: [provideAnimationsAsync(), TitleCasePipe, PercentageLabelPipe],
