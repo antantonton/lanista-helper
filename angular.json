@@ -21,7 +21,6 @@
             "assets": ["src/favicon.ico", "src/assets", "src/manifest.json"],
             "styles": [
               "src/styles.scss",
-              "@angular/material/prebuilt-themes/indigo-pink.css",
               "node_modules/primeng/resources/themes/aura-light-blue/theme.css",
               "node_modules/primeng/resources/primeng.min.css"
             ],
