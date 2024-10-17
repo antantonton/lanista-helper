@@ -3,11 +3,16 @@ import { TabService } from './shared/services/tab.service'
 import { LANISTA_BASE_URL } from './shared/constants/lanista.constants'
 import { ScriptService } from './shared/services/script.service'
 import { MeApiService } from './shared/services/me-api.service'
+import { ChallengeComponent } from './challenge/challenge.component'
+import { ButtonModule } from 'primeng/button'
+import { CommonModule } from '@angular/common'
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  styleUrl: './app.component.scss',
+  standalone: true,
+  imports: [CommonModule, ChallengeComponent, ButtonModule],
 })
 export class AppComponent {
   lanistaTab: chrome.tabs.Tab | undefined

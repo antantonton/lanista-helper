@@ -1,80 +1,4 @@
 <div *ngIf="me" class="challenge-container">
-  <!-- Race Accordion -->
-  <mat-accordion *ngIf="false">
-    <mat-expansion-panel
-      *ngFor="let race of races$ | async; let index = index"
-      [formGroup]="getRaceForm(race.id)"
-    >
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          <!-- Race -->
-          <span>
-            {{ race.name | titlecase }}
-          </span>
-        </mat-panel-title>
-
-        <mat-panel-description *ngIf="getRaceForm(race.id).value.enabled">
-          <div class="panel-description">
-            <!-- Tactic -->
-            <span>{{
-              tactics[getRaceForm(race.id).value.battle_tactic] | titlecase
-            }}</span>
-
-            <!-- Give up at -->
-            <span>
-              {{
-                getRaceForm(race.id).value.give_up_percentage
-                  | percentageLabel : me?.avatar?.max_hp
-              }}</span
-            >
-          </div>
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-
-      <!-- Race Forms -->
-      <div class="race-form-container">
-        <!-- Enabled -->
-        <mat-checkbox formControlName="enabled"></mat-checkbox>
-
-        <!-- Tactic -->
-        <mat-form-field
-          appearance="outline"
-          class="tactic-field"
-          subscriptSizing="dynamic"
-        >
-          <mat-label>Tactic</mat-label>
-          <mat-select formControlName="battle_tactic">
-            <mat-option
-              *ngFor="let tactic of tactics | keyvalue"
-              [value]="+tactic.key"
-            >
-              {{ tactic.value | titlecase }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <!-- Give up at -->
-        <mat-form-field
-          appearance="outline"
-          class="give-up-field"
-          subscriptSizing="dynamic"
-        >
-          <mat-label>Give up at</mat-label>
-          <mat-select formControlName="give_up_percentage">
-            <mat-option
-              *ngFor="let percentage of percentageOptions"
-              [value]="percentage"
-            >
-              <span style="white-space: nowrap">{{
-                percentage | percentageLabel : me?.avatar?.max_hp
-              }}</span>
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-    </mat-expansion-panel>
-  </mat-accordion>
-
   <!-- Race Forms -->
   <div class="race-forms-container">
     <div
@@ -96,8 +20,8 @@
 
         <!-- Race Tactic Selector -->
         <p-dropdown
-          class="race-dropdown"
-          styleClass="race-dropdown"
+          class="tactic-dropdown"
+          styleClass="tactic-dropdown"
           formControlName="battle_tactic"
           [options]="tacticOptions"
           optionLabel="label"
@@ -106,7 +30,8 @@
 
         <!-- Race Give up At Selector -->
         <p-dropdown
-          styleClass="race-dropdown"
+          class="percentage-dropdown"
+          styleClass="percentage-dropdown"
           formControlName="give_up_percentage"
           [options]="percentageOptions"
           optionLabel="label"
@@ -127,18 +52,19 @@
         autocomplete="off"
         [showButtons]="true"
         inputId="minLevel"
+        class="level-input"
       />
     </div>
 
     <!-- Nax Level Input -->
-    <div class="bottom-row-input-wrapper level-input">
-      <label for="minLevel">Max</label>
+    <div class="bottom-row-input-wrapper">
+      <label for="maxLevel">Max</label>
       <p-inputNumber
-        styleClass=""
         formControlName="max_level"
         autocomplete="off"
         [showButtons]="true"
-        inputId="minLevel"
+        inputId="maxLevel"
+        class="level-input"
       />
     </div>
 
@@ -152,62 +78,18 @@
         optionValue="value"
       />
     </div>
-  </div>
 
-  <div [formGroup]="challengeForm" class="bottom-row" *ngIf="false">
-    <!-- Min level -->
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Min</mat-label>
-      <input
-        matInput
-        type="number"
-        autocomplete="off"
-        formControlName="min_level"
-      />
-    </mat-form-field>
-
-    <!-- Max level -->
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Max</mat-label>
-      <input
-        matInput
-        type="number"
-        autocomplete="off"
-        formControlName="max_level"
-      />
-    </mat-form-field>
-
-    <!-- Start at -->
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Start at</mat-label>
-      <mat-select formControlName="min_start_percentage">
-        <mat-option
-          *ngFor="let percentage of percentageOptions"
-          [value]="percentage"
-        >
-          {{ percentage.value | percentageLabel : me?.avatar?.max_hp }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <!-- Send button -->
-    <div class="button-wrapper">
-      <button
-        mat-flat-button
-        color="accent"
-        [disabled]="sending"
-        (click)="sendChallenge()"
-      >
-        <span *ngIf="!sending">Send</span>
-        <mat-icon *ngIf="sending"
-          ><mat-spinner color="accent" diameter="24"></mat-spinner
-        ></mat-icon>
-      </button>
-    </div>
+    <!-- Send Button -->
+    <p-button
+      label="Send"
+      [disabled]="sending"
+      [loading]="sending"
+      (click)="sendChallenge()"
+    />
   </div>
 </div>
 
 <!-- Loading spinner -->
 <div *ngIf="!me" class="spinner-container">
-  <mat-spinner diameter="48" color="accent"></mat-spinner>
+  <p-progressSpinner />
 </div>

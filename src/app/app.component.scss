@@ -1,4 +1,13 @@
 .app-container {
   width: 500px;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.no-lanista-tab-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
 }

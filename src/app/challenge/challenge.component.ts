@@ -1,5 +1,5 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import {
   ChallengeApiService,
   RaceTactics,
@@ -13,8 +13,14 @@ import {
   LocalStorageService,
 } from '../shared/services/local-storage.service'
 import { firstValueFrom, Subscription } from 'rxjs'
-import { TitleCasePipe } from '@angular/common'
+import { CommonModule, TitleCasePipe } from '@angular/common'
 import { PercentageLabelPipe } from '../shared/pipes/percentage-label.pipe'
+import { CheckboxModule } from 'primeng/checkbox'
+import { InputNumberModule } from 'primeng/inputnumber'
+import { ButtonModule } from 'primeng/button'
+import { DropdownModule } from 'primeng/dropdown'
+import { DividerModule } from 'primeng/divider'
+import { ProgressSpinnerModule } from 'primeng/progressspinner'
 
 type ChallengeFormValue = {
   min_level: number | null
@@ -26,7 +32,19 @@ type StoredChallengeFormValue = { [id: number]: ChallengeFormValue }
 @Component({
   selector: 'app-challenge',
   templateUrl: './challenge.component.html',
-  styleUrls: ['./challenge.component.scss'],
+  styleUrl: './challenge.component.scss',
+  standalone: true,
+  imports: [
+    CommonModule,
+    CheckboxModule,
+    InputNumberModule,
+    ButtonModule,
+    DropdownModule,
+    DividerModule,
+    ProgressSpinnerModule,
+    ReactiveFormsModule,
+  ],
+  providers: [TitleCasePipe, PercentageLabelPipe],
 })
 export class ChallengeComponent implements OnInit, OnDestroy {
   private readonly _percentageLabelPipe = inject(PercentageLabelPipe)
