@@ -7,11 +7,21 @@
   "action": {
     "default_popup": "index.html"
   },
+  "content_scripts": [
+    {
+      "js": ["content-script.js"],
+      "matches": ["https://beta.lanista.se/*"]
+    },
+    {
+      "js": ["runtime.js"],
+      "matches": ["https://beta.lanista.se/*"]
+    }
+  ],
   "icons": {
     "16": "assets/icons/icon-16.png",
     "48": "assets/icons/icon-48.png",
     "128": "assets/icons/icon-128.png"
   },
-  "permissions": ["scripting"],
+  "permissions": ["scripting", "activeTab", "webNavigation", "alarms"],
   "host_permissions": ["https://beta.lanista.se/"]
 }

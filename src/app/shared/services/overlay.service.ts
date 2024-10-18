@@ -12,7 +12,8 @@ import { isAfter, format, differenceInDays } from 'date-fns'
   providedIn: 'root',
 })
 export class OverlayService {
-  private readonly _overlayElementId = 'lanista-helper'
+  private readonly _localStorageProcessIdKey = 'lanista-helper-timer-id'
+  private readonly _injectedElementId = 'lanista-helper'
   private readonly _scriptService = inject(ScriptService)
   private readonly _tabService = inject(TabService)
   private readonly _buildingApiService = inject(BuildingApiService)
@@ -23,13 +24,19 @@ export class OverlayService {
     const lanistaTab = await this._tabService.getLanistaTab()
     console.log('lanistaTab: ', lanistaTab)
 
+    // Check if html is already injected
     if (await this._isInjected()) {
       await this._removeInjection()
     }
 
+    // Stop existing process
+    await this._stopExistingProcess()
+
+    // Generate html to inject
     const htmlToInject = await this._gethtmlToInject()
 
-    const timerId = await this._scriptService.runFunction(
+    // Inject html and start process
+    const processId = await this._scriptService.runFunction(
       function (id: string, htmlToInject: string): number {
         const element = document.createElement('div')
         element.id = id
@@ -53,30 +60,34 @@ export class OverlayService {
           )
         }
 
+        const timerStart = Date.now()
+
         let i = 0
         const timerId = window.setInterval(() => {
-          console.log('i: ', i)
+          console.log('i: ', timerStart, i)
           i++
-        }, 60000)
+
+          // fetch('https://beta.lanista.se/api/city/buildings', {
+          //   headers: {
+          //     accept: 'application/json',
+          //     'content-type': 'application/json',
+          //     'x-xsrf-token': token,
+          //   },
+          //   method: 'GET',
+          // })
+          //   .then((buildings: Building[]) => {})
+          //   .catch((error) => {
+          //     console.error('error: ', error)
+          //   })
+        }, 10000)
         console.log('timerId: ', timerId)
         return timerId
       },
-      [this._overlayElementId, htmlToInject],
+      [this._injectedElementId, htmlToInject],
     )
 
-    await new Promise((resolve) => setTimeout(resolve, 5000))
-    if (timerId) {
-      await this._stopTimer(timerId)
-    }
-  }
-
-  private async _stopTimer(timerId: number): Promise<void> {
-    await this._scriptService.runFunction(
-      function (timerId: number): void {
-        clearInterval(timerId)
-      },
-      [timerId],
-    )
+    // Save process id to local storage
+    localStorage.setItem(this._localStorageProcessIdKey, String(processId))
   }
 
   private async _isInjected(): Promise<boolean> {
@@ -84,7 +95,7 @@ export class OverlayService {
       function (id: string) {
         return Boolean(document.getElementById(id))
       },
-      [this._overlayElementId],
+      [this._injectedElementId],
     )
     return Boolean(elementExists)
   }
@@ -97,15 +108,29 @@ export class OverlayService {
           element.remove()
         }
       },
-      [this._overlayElementId],
+      [this._injectedElementId],
     )
+  }
+
+  private async _stopExistingProcess(): Promise<void> {
+    const processId = localStorage.getItem(this._localStorageProcessIdKey)
+    if (!processId) {
+      return
+    }
+    await this._scriptService.runFunction(
+      function (timerId: number): void {
+        clearInterval(timerId)
+      },
+      [Number(processId)],
+    )
+    localStorage.removeItem(this._localStorageProcessIdKey)
   }
 
   private async _gethtmlToInject(): Promise<string> {
     const classes =
       'flex flex-row gap-4 notice md:mt-2 md:mb-2 p-2 md:pb-2 pb-1 w-full md:border border-b border-t border-black md:border-gray-600 md:rounded shadow-xl fixed z-10 md:relative left-0 top-0'
     return `<div id="${
-      this._overlayElementId
+      this._injectedElementId
     }" class="${classes}">${await this._getBuildingsHtml()}</div>`
   }
 

@@ -29,4 +29,26 @@ export class ScriptService {
       )
     })
   }
+
+  async runScript<ArgType extends any[], ReturnType>(
+    scriptPath: string,
+    args?: ArgType,
+  ): Promise<ReturnType> {
+    const tab = await this._tabService.getLanistaTab()
+    if (!tab) {
+      throw new Error('No tab found')
+    }
+
+    return new Promise<ReturnType>((resolve) => {
+      chrome.scripting.executeScript<ArgType, ReturnType>(
+        {
+          target: { tabId: tab.id as number },
+          files: [scriptPath],
+        },
+        (response) => {
+          resolve(response[0].result as ReturnType)
+        },
+      )
+    })
+  }
 }
