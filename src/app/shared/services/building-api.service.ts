@@ -8,7 +8,7 @@ export type Building = {
   usage: {
     last_usage: string
     next_usage: string
-  }
+  } | null
 }
 
 export enum BuildingId {

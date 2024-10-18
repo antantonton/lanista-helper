@@ -1,13 +1,18 @@
 import { inject, Injectable } from '@angular/core'
 import { TabService } from './tab.service'
 import { ScriptService } from './script.service'
-import { BuildingApiService, BuildingId } from './building-api.service'
+import {
+  Building,
+  BuildingApiService,
+  BuildingId,
+} from './building-api.service'
+import { isAfter, format, differenceInDays } from 'date-fns'
 
 @Injectable({
   providedIn: 'root',
 })
 export class OverlayService {
-  private readonly _overlayElementId = 'lanista-helper-overlay'
+  private readonly _overlayElementId = 'lanista-helper'
   private readonly _scriptService = inject(ScriptService)
   private readonly _tabService = inject(TabService)
   private readonly _buildingApiService = inject(BuildingApiService)
@@ -18,69 +23,45 @@ export class OverlayService {
     const lanistaTab = await this._tabService.getLanistaTab()
     console.log('lanistaTab: ', lanistaTab)
 
-    const overlayIsOpen = await this._isOverlayOpen()
-    console.log('overlayIsOpen: ', overlayIsOpen)
-    if (overlayIsOpen) {
-      await this._closeOverlay()
+    if (await this._isInjected()) {
+      await this._removeInjection()
     }
 
-    const buildings = await this._buildingApiService.getBuildings()
-
-    const relevantBuildings = buildings.filter((building) =>
-      [BuildingId.LIBRARY, BuildingId.TRAINING, BuildingId.HEALING].includes(
-        building.id,
-      ),
-    )
-
-    const buildingHtml = relevantBuildings
-      .map((building) => {
-        return `<span class="font-serif">${building.name}</span>
-        <br>
-        <span class="text-sm">${this._formatTimeDifference(
-          new Date(building.usage.next_usage),
-        )}</span>`
-      })
-      .join('<br><br>')
+    const htmlToInject = await this._gethtmlToInject()
 
     const timerId = await this._scriptService.runFunction(
-      function (id: string, content: string): number {
-        console.log('här')
+      function (id: string, htmlToInject: string): number {
         const element = document.createElement('div')
         element.id = id
-        document.body.appendChild(element)
-        console.log('element: ', element)
-        element.style.position = 'fixed'
-        element.style.justifyContent = 'end'
-        element.style.alignItems = 'start'
-        element.style.display = 'flex'
-        element.style.top = '0'
-        element.style.right = '0'
-        element.style.background = 'rgba(0, 0, 0, 0.3)'
-        element.style.color = 'white'
-        element.style.zIndex = '9999'
-        element.style.height = 'auto'
-        element.style.width = 'auto'
-        element.style.pointerEvents = 'none'
-        element.style.padding = '10px'
+        element.innerHTML = htmlToInject
 
-        const span = document.createElement('span')
-        element.appendChild(span)
-        span.innerHTML = content
-        // span.style.pointerEvents = 'auto'
-        span.style.textAlign = 'end'
+        const noticeElement = document.getElementsByClassName(
+          'notice',
+        )?.[0] as HTMLElement
+        console.log('noticeElement: ', noticeElement)
 
-        // span.classList.add('font-serif')
-        // span.classList.add('text-green-600')
+        if (noticeElement) {
+          // Get notice element background color
+          const noticeElementBackground =
+            window.getComputedStyle(noticeElement).background
+          element.style.background = noticeElementBackground
+
+          // Insert after notice element
+          noticeElement.parentElement.parentElement.insertBefore(
+            element,
+            noticeElement.parentElement.nextSibling,
+          )
+        }
 
         let i = 0
         const timerId = window.setInterval(() => {
           console.log('i: ', i)
           i++
-        }, 10000)
+        }, 60000)
         console.log('timerId: ', timerId)
         return timerId
       },
-      [this._overlayElementId, buildingHtml],
+      [this._overlayElementId, htmlToInject],
     )
 
     await new Promise((resolve) => setTimeout(resolve, 5000))
@@ -98,7 +79,7 @@ export class OverlayService {
     )
   }
 
-  private async _isOverlayOpen(): Promise<boolean> {
+  private async _isInjected(): Promise<boolean> {
     const elementExists = await this._scriptService.runFunction(
       function (id: string) {
         return Boolean(document.getElementById(id))
@@ -108,7 +89,7 @@ export class OverlayService {
     return Boolean(elementExists)
   }
 
-  private async _closeOverlay(): Promise<void> {
+  private async _removeInjection(): Promise<void> {
     await this._scriptService.runFunction(
       function (id: string) {
         const element = document.getElementById(id)
@@ -120,38 +101,48 @@ export class OverlayService {
     )
   }
 
-  private _formatTimeDifference(date: Date): string {
-    const now = new Date().getTime()
-    const diffInSeconds = Math.floor((date.getTime() - now) / 1000)
-    let result = ''
+  private async _gethtmlToInject(): Promise<string> {
+    const classes =
+      'flex flex-row gap-4 notice md:mt-2 md:mb-2 p-2 md:pb-2 pb-1 w-full md:border border-b border-t border-black md:border-gray-600 md:rounded shadow-xl fixed z-10 md:relative left-0 top-0'
+    return `<div id="${
+      this._overlayElementId
+    }" class="${classes}">${await this._getBuildingsHtml()}</div>`
+  }
 
-    if (diffInSeconds > 0) {
-      const hours = Math.floor(diffInSeconds / 3600)
-      const minutes = Math.floor((diffInSeconds % 3600) / 60)
+  private async _getBuildingsHtml(): Promise<string> {
+    const buildings = await this._buildingApiService.getBuildings()
+    console.log('buildings: ', buildings)
+    const relevantBuildings = buildings.filter((building) =>
+      [BuildingId.LIBRARY, BuildingId.TRAINING, BuildingId.HEALING].includes(
+        building.id,
+      ),
+    )
+    return relevantBuildings
+      .map((building) => this._getBuildingHtml(building))
+      .join('\n')
+  }
 
-      if (hours > 0) {
-        result += `${hours} hour${hours > 1 ? 's' : ''}`
-      }
-      if (minutes > 0) {
-        result +=
-          (result ? ', ' : '') + `${minutes} minute${minutes > 1 ? 's' : ''}`
-      }
-      result = `in ${result}`
+  private _getBuildingHtml(building: Building): string {
+    const rows: string[] = [
+      `<p class="text-sm capitalize font-semibold">${building.name}:</p>`,
+      `<p class="text-sm mr-4">${this._getTimeLabel(building)}</p>`,
+    ]
+    return `<div class="flex flex-row gap-2">${rows.join('\n')}</div>`
+  }
+
+  private _getTimeLabel(building: Building): string {
+    const date = building.usage?.next_usage
+      ? new Date(building.usage.next_usage)
+      : null
+    const now = new Date()
+    if (!date) {
+      return 'Redo'
+    } else if (!isAfter(date, now)) {
+      return 'Redo'
+    } else if (differenceInDays(date, now) > 0) {
+      return format(date, 'EEE HH:mm')
     } else {
-      const absDiffInSeconds = Math.abs(diffInSeconds)
-      const hours = Math.floor(absDiffInSeconds / 3600)
-      const minutes = Math.floor((absDiffInSeconds % 3600) / 60)
-
-      if (hours > 0) {
-        result += `${hours} hour${hours > 1 ? 's' : ''}`
-      }
-      if (minutes > 0) {
-        result +=
-          (result ? ', ' : '') + `${minutes} minute${minutes > 1 ? 's' : ''}`
-      }
-      result = `${result} ago`
+      return format(date, 'HH:mm')
     }
-
-    return result || 'just now'
   }
 }
