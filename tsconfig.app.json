@@ -5,6 +5,6 @@
     "outDir": "./out-tsc/app",
     "types": ["chrome"]
   },
-  "files": ["src/main.ts", "src/content-script.ts"],
+  "files": ["src/main.ts", "src/content-script/index.ts"],
   "include": ["src/**/*.d.ts"]
 }
