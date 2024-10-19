@@ -1,4 +1,4 @@
-import { differenceInDays, format, isAfter } from 'date-fns'
+import { differenceInDays, format, isAfter, isSameDay } from 'date-fns'
 import { getToken } from './lanista'
 import { LANISTA_BASE_URL } from 'src/app/shared/constants/lanista.constants'
 
@@ -60,7 +60,7 @@ function _getTimeLabel(building: Building): string {
     return 'Redo'
   } else if (!isAfter(date, now)) {
     return 'Redo'
-  } else if (differenceInDays(date, now) > 0) {
+  } else if (!isSameDay(date, now)) {
     return format(date, 'EEE HH:mm')
   } else {
     return format(date, 'HH:mm')
