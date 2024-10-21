@@ -6,8 +6,6 @@ import { InjectAction } from 'src/app/shared/services/inject.service'
 
 let me: Me | undefined
 async function main(): Promise<void> {
-  console.log('hello from content script')
-
   me = await getMe()
   console.log('me: ', me)
 
@@ -19,6 +17,7 @@ async function main(): Promise<void> {
 const observer = new PerformanceObserver((list) => {
   for (const entry of list.getEntries() as PerformanceResourceTiming[]) {
     if (entry.initiatorType === 'xmlhttprequest') {
+      console.log(entry.name, entry)
       if (me && isBuildingUseCall(entry.name)) {
         refreshInjectedHtml(me)
       }
@@ -32,11 +31,9 @@ observer.observe({
 // Listen to messages from pop-up
 chrome.runtime.onMessage.addListener((message) => {
   if (message.action === InjectAction.SHOW) {
-    console.log('showing injection')
     showInjection()
     refreshInjectedHtml(me)
   } else if (message.action === InjectAction.HIDE) {
-    console.log('hiding injection')
     hideInjection()
   }
   return true
