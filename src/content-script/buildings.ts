@@ -2,6 +2,7 @@ import { format, isAfter, isSameDay } from 'date-fns'
 import { getToken } from './lanista'
 import { LANISTA_BASE_URL } from 'src/app/shared/constants/lanista.constants'
 import { Me } from 'src/app/shared/services/me-api.service'
+import { getNextUsageHtml } from './helpers'
 
 export type Building = {
   id: BuildingId
@@ -138,7 +139,7 @@ export async function getBuildingsHtml(me: Me): Promise<string> {
 
   // Generate and return html
   const html = buildingData.map(({ name, nextUsageLabel }) =>
-    _getBuildingHtml(name, nextUsageLabel),
+    getNextUsageHtml(name, nextUsageLabel),
   )
   return html.join('\n')
 }
@@ -149,14 +150,6 @@ export function isBuildingUseCall(url: string): boolean {
     urlSegments.at(-3).includes('buildings') &&
     urlSegments.at(-1).includes('use')
   )
-}
-
-function _getBuildingHtml(name: string, nextUsageLabel: string): string {
-  const rows: string[] = [
-    `<p class="text-sm capitalize font-semibold">${name}:</p>`,
-    `<p class="text-sm mr-4">${nextUsageLabel}</p>`,
-  ]
-  return `<div class="flex flex-row gap-2">${rows.join('\n')}</div>`
 }
 
 function _getTimeLabel(nextUsage: string | undefined): string {

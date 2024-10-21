@@ -1,3 +1,20 @@
+.injection-setting-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  align-items: center;
+  gap: 12px;
+  margin-left: 12px;
+  margin-right: 12px;
+  margin-bottom: 8px;
+}
+
+.checkbox-label {
+  font-size: 16px;
+  font-weight: 500;
+  margin-right: 8px;
+}
+
 .challenge-container {
   display: flex;
   flex-direction: column;
@@ -33,11 +50,6 @@
         align-items: center;
         gap: 12px;
         flex: 1 1 auto;
-        label {
-          font-size: 16px;
-          font-weight: 500;
-          margin-right: 8px;
-        }
       }
     }
   }
@@ -75,8 +87,4 @@
   input {
     width: 100%;
   }
-}
-
-.test-klass-2 {
-  width: 1338px;
 }

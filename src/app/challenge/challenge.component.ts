@@ -1,5 +1,10 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core'
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms'
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms'
 import {
   ChallengeApiService,
   RaceTactics,
@@ -15,12 +20,13 @@ import {
 import { firstValueFrom, Subscription } from 'rxjs'
 import { CommonModule, TitleCasePipe } from '@angular/common'
 import { PercentageLabelPipe } from '../shared/pipes/percentage-label.pipe'
-import { CheckboxModule } from 'primeng/checkbox'
+import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox'
 import { InputNumberModule } from 'primeng/inputnumber'
 import { ButtonModule } from 'primeng/button'
 import { DropdownModule } from 'primeng/dropdown'
 import { DividerModule } from 'primeng/divider'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
+import { InjectService } from '../shared/services/inject.service'
 
 type ChallengeFormValue = {
   min_level: number | null
@@ -43,10 +49,12 @@ type StoredChallengeFormValue = { [id: number]: ChallengeFormValue }
     DividerModule,
     ProgressSpinnerModule,
     ReactiveFormsModule,
+    FormsModule,
   ],
   providers: [TitleCasePipe, PercentageLabelPipe],
 })
 export class ChallengeComponent implements OnInit, OnDestroy {
+  private readonly _injectService = inject(InjectService)
   private readonly _percentageLabelPipe = inject(PercentageLabelPipe)
   private readonly _titleCasePipe = inject(TitleCasePipe)
   private readonly _subscriptions = new Subscription()
@@ -67,6 +75,7 @@ export class ChallengeComponent implements OnInit, OnDestroy {
   readonly races$ = this._configApiService.getRacesObservable()
   percentageOptions: { label: string; value: number }[] = []
 
+  injectChecked = true
   me: Me
   tactics: { [id: number]: string } = {}
   tacticOptions: { label: string; value: number }[] = []
@@ -80,6 +89,10 @@ export class ChallengeComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this._injectService.isVisible().then((isVisible) => {
+      this.injectChecked = isVisible
+    })
+
     firstValueFrom(this.tactics$).then((tactics) => {
       // Invert the tactics object so that we may use it to map id to label
       this.tactics = invert(tactics)
@@ -171,6 +184,16 @@ export class ChallengeComponent implements OnInit, OnDestroy {
    */
   getRaceForm(raceId: number): FormGroup {
     return this.raceForms.get(raceId.toString()) as FormGroup
+  }
+
+  toggleInjection(event: CheckboxChangeEvent): void {
+    console.log('toggleInjection', event.checked)
+
+    if (event.checked) {
+      this._injectService.enableInject()
+    } else {
+      this._injectService.disableInject()
+    }
   }
 
   /**

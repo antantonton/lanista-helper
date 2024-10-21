@@ -1,7 +1,8 @@
 import { Me } from 'src/app/shared/services/me-api.service'
 import { isBuildingUseCall } from './buildings'
-import { refreshInjectedHtml } from './injection'
+import { hideInjection, refreshInjectedHtml, showInjection } from './injection'
 import { getMe } from './me'
+import { InjectAction } from 'src/app/shared/services/inject.service'
 
 let me: Me | undefined
 async function main(): Promise<void> {
@@ -28,9 +29,21 @@ observer.observe({
   entryTypes: ['resource'],
 })
 
+// Listen to messages from pop-up
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.action === InjectAction.SHOW) {
+    console.log('showing injection')
+    showInjection()
+    refreshInjectedHtml(me)
+  } else if (message.action === InjectAction.HIDE) {
+    console.log('hiding injection')
+    hideInjection()
+  }
+  return true
+})
+
 main()
 
 // TODO
 // Add listener to setting in extension popup
-// Fix so that it runs when page is loaded instead of arbitrary delay
 // Hijack "me" instead of calling again

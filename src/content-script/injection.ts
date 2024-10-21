@@ -1,9 +1,34 @@
 import { Me } from 'src/app/shared/services/me-api.service'
 import { getBuildingsHtml } from './buildings'
+import { getChanceGameHtml } from './chance-game'
 
 const _injectedElementId = 'lanista-helper'
+export const INJECTION_VISIBILITY_KEY = 'lanista-injection-visibility'
+
+export enum InjectionVisibility {
+  HIDDEN = 'HIDDEN',
+  VISIBLE = 'VISIBLE',
+}
+
+export function hideInjection(): void {
+  localStorage.setItem(INJECTION_VISIBILITY_KEY, InjectionVisibility.HIDDEN)
+  document.getElementById(_injectedElementId)?.remove()
+}
+
+export function showInjection(): void {
+  localStorage.setItem(INJECTION_VISIBILITY_KEY, InjectionVisibility.VISIBLE)
+}
+
+export function isVisible(): boolean {
+  const visibility = localStorage.getItem(INJECTION_VISIBILITY_KEY)
+  return visibility !== InjectionVisibility.HIDDEN
+}
 
 export async function refreshInjectedHtml(me: Me): Promise<void> {
+  if (!isVisible()) {
+    return
+  }
+
   const html = await _getHtmlToInject(me)
 
   // Check if container exists
@@ -59,9 +84,15 @@ async function _getHtmlToInject(me: Me): Promise<string> {
     'left-0',
     'top-0',
   ]
-  const styles = []
+  const styles = ['w-full']
+
+  const leftSideHtml = `${await getBuildingsHtml(me)}`
+  const middleHtml = `<div class="flex" style="flex: 1 1 auto;"></div>`
+  const rightSideHtml = `${getChanceGameHtml(me)}`
 
   return `<div id="${_injectedElementId}" class="${classes.join(
     ' ',
-  )}" style="${styles.join('; ')}">${await getBuildingsHtml(me)}</div>`
+  )}" style="${styles.join('; ')}">
+  ${leftSideHtml}${middleHtml}${rightSideHtml}
+  </div>`
 }

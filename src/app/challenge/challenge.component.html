@@ -1,3 +1,15 @@
+<!-- Injection Setting  -->
+<div class="injection-setting-container">
+  <label for="injectCheckbox" class="checkbox-label">
+    Show building cooldowns
+  </label>
+  <p-checkbox
+    [binary]="true"
+    inputId="injectCheckbox"
+    (onChange)="toggleInjection($event)"
+    [(ngModel)]="injectChecked"
+  />
+</div>
 <div *ngIf="me" class="challenge-container">
   <!-- Race Forms -->
   <div class="race-forms-container">
@@ -13,7 +25,7 @@
             [binary]="true"
             [inputId]="'raceCheckbox' + index"
           />
-          <label [for]="'raceCheckbox' + index">
+          <label [for]="'raceCheckbox' + index" class="checkbox-label">
             {{ race.name | titlecase }}
           </label>
         </div>

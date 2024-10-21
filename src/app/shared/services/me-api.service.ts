@@ -11,6 +11,7 @@ export type Avatar = {
   id: number
   available_time: number
   remaining_to_full_hp: number
+  last_chance_full_hp?: string | null
   max_hp: number
   default_autostart_percentage: number
   default_give_up_percentage: number
