@@ -29,3 +29,8 @@ observer.observe({
 })
 
 main()
+
+// TODO
+// Add listener to setting in extension popup
+// Fix so that it runs when page is loaded instead of arbitrary delay
+// Hijack "me" instead of calling again
