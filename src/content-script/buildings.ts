@@ -1,6 +1,7 @@
-import { differenceInDays, format, isAfter, isSameDay } from 'date-fns'
+import { format, isAfter, isSameDay } from 'date-fns'
 import { getToken } from './lanista'
 import { LANISTA_BASE_URL } from 'src/app/shared/constants/lanista.constants'
+import { Me } from 'src/app/shared/services/me-api.service'
 
 export type Building = {
   id: BuildingId
@@ -17,9 +18,27 @@ export enum BuildingId {
   HEALING = 3,
 }
 
-export async function getBuildings(): Promise<Building[]> {
+export type ClanBuilding = {
+  id: ClanBuildingId
+  clan_building_usage?: {
+    last_usage: string
+    next_usage: string
+  } | null
+}
+
+export enum ClanBuildingId {
+  LIBRARY = 13,
+  TRAINING = 12,
+  MINE = 14,
+}
+
+const cityBuildingsEndpoint = `${LANISTA_BASE_URL}/api/city/buildings`
+const getClanBuildingsEndpoint = (clanId: number) =>
+  `${LANISTA_BASE_URL}/api/clans/${clanId}/buildings`
+
+export async function getCityBuildings(): Promise<Building[]> {
   const token = getToken()
-  const buildings = await fetch(`${LANISTA_BASE_URL}/api/city/buildings`, {
+  const buildings = await fetch(cityBuildingsEndpoint, {
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
@@ -30,31 +49,118 @@ export async function getBuildings(): Promise<Building[]> {
   return buildings
 }
 
-export async function getBuildingsHtml(): Promise<string> {
-  const buildings = await getBuildings()
-  console.log('buildings: ', buildings)
-  const relevantBuildings = buildings.filter((building) =>
-    [BuildingId.LIBRARY, BuildingId.TRAINING, BuildingId.HEALING].includes(
-      building.id,
-    ),
-  )
-  return relevantBuildings
-    .map((building) => _getBuildingHtml(building))
-    .join('\n')
+export async function getClanBuildings(
+  clanId: number,
+): Promise<ClanBuilding[]> {
+  const token = getToken()
+  const buildings = await fetch(getClanBuildingsEndpoint(clanId), {
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      'x-xsrf-token': token,
+    },
+    method: 'GET',
+  }).then((response) => response.json())
+  return buildings
 }
 
-function _getBuildingHtml(building: Building): string {
+export async function getBuildingsHtml(me: Me): Promise<string> {
+  const hasClan = Boolean(me?.avatar?.clan?.id)
+  const [buildings, clanBuildings] = await Promise.all([
+    getCityBuildings(),
+    hasClan
+      ? getClanBuildings(me.avatar.clan.id)
+      : Promise.resolve([] as ClanBuilding[]),
+  ])
+
+  // Add clan buildings
+  const buildingData: { name: string; nextUsageLabel: string }[] = []
+  if (hasClan) {
+    const library = clanBuildings.find(
+      (building) => building.id === ClanBuildingId.LIBRARY,
+    )
+    if (library) {
+      buildingData.push({
+        name: _getNameForClanBuilding(library, buildings),
+        nextUsageLabel: _getTimeLabel(library?.clan_building_usage?.next_usage),
+      })
+    }
+    const training = clanBuildings.find(
+      (building) => building.id === ClanBuildingId.TRAINING,
+    )
+    if (training) {
+      buildingData.push({
+        name: _getNameForClanBuilding(training, buildings),
+        nextUsageLabel: _getTimeLabel(
+          training?.clan_building_usage?.next_usage,
+        ),
+      })
+    }
+    const mine = clanBuildings.find(
+      (building) => building.id === ClanBuildingId.MINE,
+    )
+    if (mine) {
+      buildingData.push({
+        name: _getNameForClanBuilding(mine, buildings),
+        nextUsageLabel: _getTimeLabel(mine?.clan_building_usage?.next_usage),
+      })
+    }
+  }
+
+  // Add city buildings
+  const library = buildings.find(
+    (building) => building.id === BuildingId.LIBRARY,
+  )
+  if (library && !hasClan) {
+    buildingData.push({
+      name: library.name,
+      nextUsageLabel: _getTimeLabel(library?.usage?.next_usage),
+    })
+  }
+  const training = buildings.find(
+    (building) => building.id === BuildingId.TRAINING,
+  )
+  if (training && !hasClan) {
+    buildingData.push({
+      name: training.name,
+      nextUsageLabel: _getTimeLabel(training?.usage?.next_usage),
+    })
+  }
+  const healing = buildings.find(
+    (building) => building.id === BuildingId.HEALING,
+  )
+  if (healing) {
+    buildingData.push({
+      name: healing.name,
+      nextUsageLabel: _getTimeLabel(healing?.usage?.next_usage),
+    })
+  }
+
+  // Generate and return html
+  const html = buildingData.map(({ name, nextUsageLabel }) =>
+    _getBuildingHtml(name, nextUsageLabel),
+  )
+  return html.join('\n')
+}
+
+export function isBuildingUseCall(url: string): boolean {
+  const urlSegments = url.split('/')
+  return (
+    urlSegments.at(-3).includes('buildings') &&
+    urlSegments.at(-1).includes('use')
+  )
+}
+
+function _getBuildingHtml(name: string, nextUsageLabel: string): string {
   const rows: string[] = [
-    `<p class="text-sm capitalize font-semibold">${building.name}:</p>`,
-    `<p class="text-sm mr-4">${_getTimeLabel(building)}</p>`,
+    `<p class="text-sm capitalize font-semibold">${name}:</p>`,
+    `<p class="text-sm mr-4">${nextUsageLabel}</p>`,
   ]
   return `<div class="flex flex-row gap-2">${rows.join('\n')}</div>`
 }
 
-function _getTimeLabel(building: Building): string {
-  const date = building.usage?.next_usage
-    ? new Date(building.usage.next_usage)
-    : null
+function _getTimeLabel(nextUsage: string | undefined): string {
+  const date = nextUsage ? new Date(nextUsage) : null
   const now = new Date()
   if (!date) {
     return 'Redo'
@@ -64,6 +170,27 @@ function _getTimeLabel(building: Building): string {
     return format(date, 'EEE HH:mm')
   } else {
     return format(date, 'HH:mm')
+  }
+}
+
+function _getNameForClanBuilding(
+  clanBuilding: ClanBuilding,
+  buildings: Building[],
+): string {
+  if (clanBuilding.id === ClanBuildingId.LIBRARY) {
+    return (
+      buildings.find((building) => building.id === BuildingId.LIBRARY)?.name ||
+      ''
+    )
+  } else if (clanBuilding.id === ClanBuildingId.TRAINING) {
+    return (
+      buildings.find((building) => building.id === BuildingId.TRAINING)?.name ||
+      ''
+    )
+  } else if (clanBuilding.id === ClanBuildingId.MINE) {
+    return 'Gruva'
+  } else {
+    return ''
   }
 }
 

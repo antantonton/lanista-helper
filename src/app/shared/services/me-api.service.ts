@@ -15,10 +15,10 @@ export type Avatar = {
   default_autostart_percentage: number
   default_give_up_percentage: number
   default_tactic: number
-  clan: {
+  clan?: {
     id: number
     name: string
-  }
+  } | null
   level: {
     level: number
   }

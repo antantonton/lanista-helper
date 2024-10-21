@@ -1,9 +1,10 @@
+import { Me } from 'src/app/shared/services/me-api.service'
 import { getBuildingsHtml } from './buildings'
 
 const _injectedElementId = 'lanista-helper'
 
-export async function refreshInjectedHtml(): Promise<void> {
-  const html = await _gethtmlToInject()
+export async function refreshInjectedHtml(me: Me): Promise<void> {
+  const html = await _getHtmlToInject(me)
 
   // Check if container exists
   const existingContainer = document.getElementById(_injectedElementId)
@@ -33,7 +34,7 @@ export async function refreshInjectedHtml(): Promise<void> {
   }
 }
 
-async function _gethtmlToInject(): Promise<string> {
+async function _getHtmlToInject(me: Me): Promise<string> {
   const classes = [
     'flex',
     'flex-row',
@@ -62,5 +63,5 @@ async function _gethtmlToInject(): Promise<string> {
 
   return `<div id="${_injectedElementId}" class="${classes.join(
     ' ',
-  )}" style="${styles.join('; ')}">${await getBuildingsHtml()}</div>`
+  )}" style="${styles.join('; ')}">${await getBuildingsHtml(me)}</div>`
 }
