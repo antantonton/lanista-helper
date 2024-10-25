@@ -1,23 +1,15 @@
-import { Me } from 'src/app/shared/services/me-api.service'
 import { isBuildingUseCall } from './buildings'
 import { hideInjection, refreshInjectedHtml, showInjection } from './injection'
 import { getMe } from './me'
 import { InjectAction } from 'src/app/shared/services/inject.service'
 
-let me: Me | undefined
-async function main(): Promise<void> {
-  me = await getMe()
-  console.log('me: ', me)
+const mePromise = getMe()
 
-  setTimeout(async () => {
-    await refreshInjectedHtml(me)
-  }, 2000)
-}
-
-const observer = new PerformanceObserver((list) => {
+// Listen to network requests
+const observer = new PerformanceObserver(async (list) => {
+  const me = await mePromise
   for (const entry of list.getEntries() as PerformanceResourceTiming[]) {
     if (entry.initiatorType === 'xmlhttprequest') {
-      console.log(entry.name, entry)
       if (me && isBuildingUseCall(entry.name)) {
         refreshInjectedHtml(me)
       }
@@ -29,7 +21,8 @@ observer.observe({
 })
 
 // Listen to messages from pop-up
-chrome.runtime.onMessage.addListener((message) => {
+chrome.runtime.onMessage.addListener(async (message) => {
+  const me = await mePromise
   if (message.action === InjectAction.SHOW) {
     showInjection()
     refreshInjectedHtml(me)
@@ -39,8 +32,8 @@ chrome.runtime.onMessage.addListener((message) => {
   return true
 })
 
-main()
-
-// TODO
-// Add listener to setting in extension popup
-// Hijack "me" instead of calling again
+// Wait for the page to load before injecting
+window.onload = async () => {
+  const me = await mePromise
+  await refreshInjectedHtml(me)
+}
