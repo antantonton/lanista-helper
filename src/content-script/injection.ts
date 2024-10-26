@@ -39,9 +39,7 @@ export async function refreshInjectedHtml(me: Me): Promise<void> {
     const newContainer = document.createElement('div')
     newContainer.id = _injectedElementId
     newContainer.innerHTML = html
-    const noticeElement = document.getElementsByClassName(
-      'notice',
-    )?.[0] as HTMLElement
+    const noticeElement = await _getNoticeElement()
     if (noticeElement) {
       // Get notice element background color
       const noticeElementBackground =
@@ -57,6 +55,28 @@ export async function refreshInjectedHtml(me: Me): Promise<void> {
       console.error('Notice element not found, doing nothing')
     }
   }
+}
+
+function _getNoticeElement(): Promise<HTMLElement> {
+  return new Promise((resolve) => {
+    if (document.getElementsByClassName('notice')?.[0]) {
+      return resolve(
+        document.getElementsByClassName('notice')?.[0] as HTMLElement,
+      )
+    }
+
+    const observer = new MutationObserver((mutations) => {
+      if (document.getElementsByClassName('notice')?.[0]) {
+        observer.disconnect()
+        resolve(document.getElementsByClassName('notice')?.[0] as HTMLElement)
+      }
+    })
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    })
+  })
 }
 
 async function _getHtmlToInject(me: Me): Promise<string> {

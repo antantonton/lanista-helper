@@ -32,8 +32,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
   return true
 })
 
-// Wait for the page to load before injecting
-window.onload = async () => {
-  const me = await mePromise
+// Wait for "me" to be loaded before injecting
+mePromise.then(async (me) => {
   await refreshInjectedHtml(me)
-}
+})
