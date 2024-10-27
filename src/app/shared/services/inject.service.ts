@@ -4,7 +4,7 @@ import { ScriptService } from './script.service'
 import {
   INJECTION_VISIBILITY_KEY,
   InjectionVisibility,
-} from 'src/content-script/injection'
+} from 'src/content-script/injector.class'
 
 export enum InjectAction {
   SHOW = 'show_injection',

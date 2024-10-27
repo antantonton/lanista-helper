@@ -20,17 +20,17 @@ export enum BuildingId {
 }
 
 export type ClanBuilding = {
-  id: ClanBuildingId
+  type: ClanBuildingType
   clan_building_usage?: {
     last_usage: string
     next_usage: string
   } | null
 }
 
-export enum ClanBuildingId {
-  LIBRARY = 13,
-  TRAINING = 12,
-  MINE = 14,
+export enum ClanBuildingType {
+  LIBRARY = 2,
+  TRAINING = 1,
+  MINE = 3,
 }
 
 const cityBuildingsEndpoint = `${LANISTA_BASE_URL}/api/city/buildings`
@@ -78,7 +78,7 @@ export async function getBuildingsHtml(me: Me): Promise<string> {
   const buildingData: { name: string; nextUsageLabel: string }[] = []
   if (hasClan) {
     const library = clanBuildings.find(
-      (building) => building.id === ClanBuildingId.LIBRARY,
+      (building) => building.type === ClanBuildingType.LIBRARY,
     )
     if (library) {
       buildingData.push({
@@ -87,7 +87,7 @@ export async function getBuildingsHtml(me: Me): Promise<string> {
       })
     }
     const training = clanBuildings.find(
-      (building) => building.id === ClanBuildingId.TRAINING,
+      (building) => building.type === ClanBuildingType.TRAINING,
     )
     if (training) {
       buildingData.push({
@@ -98,7 +98,7 @@ export async function getBuildingsHtml(me: Me): Promise<string> {
       })
     }
     const mine = clanBuildings.find(
-      (building) => building.id === ClanBuildingId.MINE,
+      (building) => building.type === ClanBuildingType.MINE,
     )
     if (mine) {
       buildingData.push({
@@ -170,17 +170,17 @@ function _getNameForClanBuilding(
   clanBuilding: ClanBuilding,
   buildings: Building[],
 ): string {
-  if (clanBuilding.id === ClanBuildingId.LIBRARY) {
+  if (clanBuilding.type === ClanBuildingType.LIBRARY) {
     return (
       buildings.find((building) => building.id === BuildingId.LIBRARY)?.name ||
       ''
     )
-  } else if (clanBuilding.id === ClanBuildingId.TRAINING) {
+  } else if (clanBuilding.type === ClanBuildingType.TRAINING) {
     return (
       buildings.find((building) => building.id === BuildingId.TRAINING)?.name ||
       ''
     )
-  } else if (clanBuilding.id === ClanBuildingId.MINE) {
+  } else if (clanBuilding.type === ClanBuildingType.MINE) {
     return 'Gruva'
   } else {
     return ''

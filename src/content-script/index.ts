@@ -1,17 +1,20 @@
 import { isBuildingUseCall } from './buildings'
-import { hideInjection, refreshInjectedHtml, showInjection } from './injection'
+import { Injector } from './injector.class'
 import { getMe } from './me'
 import { InjectAction } from 'src/app/shared/services/inject.service'
 
 const mePromise = getMe()
+const injectorPromise = mePromise.then((me) => {
+  return new Injector(me)
+})
 
 // Listen to network requests
 const observer = new PerformanceObserver(async (list) => {
-  const me = await mePromise
+  const injector = await injectorPromise
   for (const entry of list.getEntries() as PerformanceResourceTiming[]) {
     if (entry.initiatorType === 'xmlhttprequest') {
-      if (me && isBuildingUseCall(entry.name)) {
-        refreshInjectedHtml(me)
+      if (isBuildingUseCall(entry.name)) {
+        injector.refreshInjectedHtml()
       }
     }
   }
@@ -22,17 +25,24 @@ observer.observe({
 
 // Listen to messages from pop-up
 chrome.runtime.onMessage.addListener(async (message) => {
-  const me = await mePromise
+  const injector = await injectorPromise
   if (message.action === InjectAction.SHOW) {
-    showInjection()
-    refreshInjectedHtml(me)
+    injector.showInjection()
+    injector.refreshInjectedHtml()
   } else if (message.action === InjectAction.HIDE) {
-    hideInjection()
+    injector.hideInjection()
   }
   return true
 })
 
 // Wait for "me" to be loaded before injecting
-mePromise.then(async (me) => {
-  await refreshInjectedHtml(me)
+injectorPromise.then(async (injector) => {
+  await injector.refreshInjectedHtml()
 })
+
+function refresh() {
+  console.log('refresh')
+  injectorPromise.then(async (injector) => {
+    await injector.refreshInjectedHtml()
+  })
+}
