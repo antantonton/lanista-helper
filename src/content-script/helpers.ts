@@ -20,7 +20,7 @@ export function getNextUsageHtml(
 ): string {
   const rows: string[] = [
     `<p class="text-sm capitalize font-semibold">${label}:</p>`,
-    `<p class="text-sm mr-4">${nextUsageLabel}</p>`,
+    `<p class="text-sm">${nextUsageLabel}</p>`,
   ]
   return `<div class="flex flex-row gap-2">${rows.join('\n')}</div>`
 }
