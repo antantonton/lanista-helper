@@ -35,7 +35,6 @@ export class Injector {
     }
 
     const html = await this._getHtmlToInject(this.me)
-    console.log('html: ', html)
     // Check if container exists
     const existingContainer = document.getElementById(this._injectedElementId)
     if (existingContainer) {
