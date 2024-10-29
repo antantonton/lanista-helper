@@ -1,6 +1,7 @@
 import { Me } from 'src/app/shared/services/me-api.service'
 import { getChanceGameHtml } from './chance-game'
 import { getBuildingsHtml } from './buildings'
+import { getRankedHtml } from './ranked'
 
 export const INJECTION_VISIBILITY_KEY = 'lanista-injection-visibility'
 export enum InjectionVisibility {
@@ -110,9 +111,15 @@ export class Injector {
     ]
     const styles = ['w-full']
 
-    const leftSideHtml = `${await getBuildingsHtml(me)}`
+    const [buildingHtml, rankedHtml, chanceGameHtml] = await Promise.all([
+      getBuildingsHtml(me),
+      getRankedHtml(me),
+      getChanceGameHtml(me),
+    ])
+
+    const leftSideHtml = `${buildingHtml}`
     const middleHtml = `<div class="flex" style="flex: 1 1 auto;"></div>`
-    const rightSideHtml = `${getChanceGameHtml(me)}`
+    const rightSideHtml = `${rankedHtml ?? ''}${chanceGameHtml}`
 
     return `<div id="${this._injectedElementId}" class="${classes.join(
       ' ',
