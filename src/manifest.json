@@ -15,6 +15,11 @@
     {
       "js": ["runtime.js"],
       "matches": ["https://beta.lanista.se/*"]
+    },
+    {
+      "world": "MAIN",
+      "js": ["content-script/interceptor.js"],
+      "matches": ["https://beta.lanista.se/*"]
     }
   ],
   "icons": {

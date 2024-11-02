@@ -29,7 +29,7 @@
               "src/favicon.ico",
               "src/assets",
               "src/manifest.json",
-              "src/test.ts"
+              "src/content-script/interceptor.js"
             ],
             "styles": ["src/styles.scss"],
             "scripts": [],
