@@ -9,6 +9,7 @@ export type Me = {
 
 export type Avatar = {
   id: number
+  name: string
   available_time: number
   remaining_to_full_hp: number
   last_chance_full_hp?: string | null

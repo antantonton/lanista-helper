@@ -2,6 +2,7 @@ import { Me } from 'src/app/shared/services/me-api.service'
 import { getChanceGameHtml } from './chance-game'
 import { getBuildingsHtml } from './buildings'
 import { getRankedHtml } from './ranked'
+import { openOverlay } from './overlay'
 
 export const INJECTION_VISIBILITY_KEY = 'lanista-injection-visibility'
 export enum InjectionVisibility {
@@ -35,25 +36,22 @@ export class Injector {
       return
     }
 
-    const html = await this._getHtmlToInject(this.me)
+    const elementToInject = await this._getHtmlToInject(this.me)
     // Check if container exists
-    const existingContainer = document.getElementById(this._injectedElementId)
-    if (existingContainer) {
-      existingContainer.innerHTML = html
+    const existingElement = document.getElementById(this._injectedElementId)
+    if (existingElement) {
+      existingElement.replaceWith(elementToInject)
     } else {
-      const newContainer = document.createElement('div')
-      newContainer.id = this._injectedElementId
-      newContainer.innerHTML = html
       const noticeElement = await this._getNoticeElement()
       if (noticeElement) {
         // Get notice element background color
         const noticeElementBackground =
           window.getComputedStyle(noticeElement).background
-        newContainer.style.background = noticeElementBackground
+        elementToInject.style.background = noticeElementBackground
 
         // Insert after notice element
         noticeElement.parentElement.parentElement.insertBefore(
-          newContainer,
+          elementToInject,
           noticeElement.parentElement.nextSibling,
         )
       } else {
@@ -84,8 +82,16 @@ export class Injector {
     })
   }
 
-  private async _getHtmlToInject(me: Me): Promise<string> {
-    const classes = [
+  private async _getHtmlToInject(me: Me): Promise<HTMLDivElement> {
+    const [buildingHtml, rankedHtml, chanceGameHtml] = await Promise.all([
+      getBuildingsHtml(me),
+      getRankedHtml(me),
+      getChanceGameHtml(me),
+    ])
+
+    const injectionContainer = document.createElement('div')
+    injectionContainer.id = this._injectedElementId
+    injectionContainer.className = [
       'flex',
       'flex-row',
       'gap-4',
@@ -108,23 +114,35 @@ export class Injector {
       'md:relative',
       'left-0',
       'top-0',
-    ]
-    const styles = ['w-full']
+    ].join(' ')
 
-    const [buildingHtml, rankedHtml, chanceGameHtml] = await Promise.all([
-      getBuildingsHtml(me),
-      getRankedHtml(me),
-      getChanceGameHtml(me),
-    ])
+    // Add left side
+    const leftSide = document.createElement('div')
+    leftSide.className = 'flex flex-row gap-4 items-center'
+    leftSide.innerHTML = buildingHtml
+    injectionContainer.appendChild(leftSide)
 
-    const leftSideHtml = `${buildingHtml}`
-    const middleHtml = `<div class="flex" style="flex: 1 1 auto;"></div>`
-    const rightSideHtml = `${rankedHtml ?? ''}${chanceGameHtml}`
+    // Add middle
+    const middle = document.createElement('div')
+    middle.className = 'flex'
+    middle.style.flex = '1 1 auto'
+    injectionContainer.appendChild(middle)
 
-    return `<div id="${this._injectedElementId}" class="${classes.join(
-      ' ',
-    )}" style="${styles.join('; ')}">
-    ${leftSideHtml}${middleHtml}${rightSideHtml}
-    </div>`
+    // Add right side
+    const rightSide = document.createElement('div')
+    rightSide.className = 'flex flex-row gap-4 items-center'
+    rightSide.innerHTML = `${rankedHtml ?? ''}${chanceGameHtml}`
+    injectionContainer.appendChild(rightSide)
+
+    // Overlay button
+    const overlayButton = document.createElement('button')
+    overlayButton.textContent = '⇲'
+    overlayButton.className = 'btn-action pt-0 pb-0'
+    overlayButton.addEventListener('click', () => {
+      openOverlay(me)
+    })
+    injectionContainer.appendChild(overlayButton)
+
+    return injectionContainer
   }
 }
