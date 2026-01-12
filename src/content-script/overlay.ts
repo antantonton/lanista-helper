@@ -33,22 +33,24 @@ export async function openOverlay(me: Me) {
   container.className = 'w-full h-full flex flex-col gap-2 bg-white notice p-3'
   pipWindow.document.body.appendChild(container)
 
-  // TODO: Hitta den med data-intro och ta dess innehåll samt de tre elementen ovanför
-  // Ovanför det bör gladiatorstall vara
-
+  // Back to lanista button
   const backToTabButton = pipWindow.document.createElement('button')
   backToTabButton.onclick = () => window.focus()
   backToTabButton.textContent = 'Lanista'
   backToTabButton.className = 'btn-action'
   container.appendChild(backToTabButton)
 
+  // Generate content container
   const contentContainer = pipWindow.document.createElement('div')
   contentContainer.id = 'content-container'
   contentContainer.style.pointerEvents = 'none'
+
+  // Generate the cloned content and add it to the container
   const clone = _getClonedContent()
   contentContainer.append(...clone)
   container.appendChild(contentContainer)
 
+  // Start interval for refreshing content
   const interval = setInterval(() => {
     const clone = _getClonedContent()
     contentContainer.replaceChildren(...clone)
@@ -62,6 +64,10 @@ export async function openOverlay(me: Me) {
   pipWindow.addEventListener('pagehide', cleanup)
 }
 
+/**
+ * Returns the cloned element to put in the overlay content
+ * @returns
+ */
 function _getClonedContent() {
   const [originalElement] = _findChildWithDataIntro(
     document.body,
@@ -83,25 +89,21 @@ function _getClonedContent() {
     .pop()
     ?.remove()
 
-  const elementsToClone = [
+  const clonedElements = [
     ..._getPreviousSiblings(originalElement, 3).map(
       (el) => el.cloneNode(true) as HTMLElement,
     ),
     characterDataElement,
   ]
-  return elementsToClone
+  return clonedElements
 }
 
-function _getByXPath(xpath: string) {
-  return document.evaluate(
-    xpath,
-    document,
-    null,
-    XPathResult.FIRST_ORDERED_NODE_TYPE,
-    null,
-  ).singleNodeValue
-}
-
+/**
+ * Finds the given nested child element with the given data intro text
+ * @param element
+ * @param text
+ * @returns
+ */
 function _findChildWithDataIntro(
   element: HTMLElement,
   text: string,
@@ -115,6 +117,12 @@ function _findChildWithDataIntro(
   ) as HTMLElement[]
 }
 
+/**
+ * Returns the X previous siblings
+ * @param el
+ * @param count
+ * @returns
+ */
 function _getPreviousSiblings(el: HTMLElement, count: number): HTMLElement[] {
   const parent = el.parentElement
   if (!parent) return []
