@@ -38,7 +38,7 @@ export async function openOverlay(me: Me) {
 
   const backToTabButton = pipWindow.document.createElement('button')
   backToTabButton.onclick = () => window.focus()
-  backToTabButton.innerHTML = 'Back to tab'
+  backToTabButton.textContent = 'Lanista'
   backToTabButton.className = 'btn-action'
   container.appendChild(backToTabButton)
 

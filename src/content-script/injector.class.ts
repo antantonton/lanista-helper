@@ -134,14 +134,16 @@ export class Injector {
     rightSide.innerHTML = `${rankedHtml ?? ''}${chanceGameHtml}`
     injectionContainer.appendChild(rightSide)
 
-    // Overlay button
-    const overlayButton = document.createElement('button')
-    overlayButton.textContent = '⇲'
-    overlayButton.className = 'btn-action pt-0 pb-0'
-    overlayButton.addEventListener('click', () => {
-      openOverlay(me)
-    })
-    injectionContainer.appendChild(overlayButton)
+    // Overlay button (only if pip is available)
+    if (document.pictureInPictureEnabled) {
+      const overlayButton = document.createElement('button')
+      overlayButton.textContent = '⇲'
+      overlayButton.className = 'btn-action pt-0 pb-0'
+      overlayButton.addEventListener('click', () => {
+        openOverlay(me)
+      })
+      injectionContainer.appendChild(overlayButton)
+    }
 
     return injectionContainer
   }
